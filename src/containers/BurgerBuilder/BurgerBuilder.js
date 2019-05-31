@@ -8,23 +8,18 @@ import Spinner from '../../components/UI/Spinner/Spinner'
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler'
 
 import { connect } from 'react-redux' 
-import * as actionTypes from '../../store/actions'
+import * as burgerBuilderActions from '../../store/actions/index'
 
 import axios from '../../axios-orders'
 
 
 class BurgerBuilder extends Component {
     state = {
-      purchasing: false,
-      loading: false,
-      errorState: false,
-      error: null
+      purchasing: false
     }
 
     componentDidMount () {
-      // axios.get('https://react-my-burger-dfe14.firebaseio.com/ingredients.json')
-      //   .then(response => this.setState({ ingredients: response.data }))
-      //   .catch(error => this.setState({ errorState: true, error: error }))
+      this.props.initIngredients()
     }
 
     onPurchaseHandler = () => {
@@ -53,7 +48,7 @@ class BurgerBuilder extends Component {
       }
 
       let orderSummary = <Spinner />
-      let burger = this.state.errorState ? <p> There is an error: {this.state.error.message}</p> : <Spinner />
+      let burger = this.props.error ? <p> There is an error</p> : <Spinner />
       if (this.props.ingredients) {
         burger = (
           <Aux>
@@ -73,11 +68,7 @@ class BurgerBuilder extends Component {
           ingredients={this.props.ingredients}
           purchaseCanceled={this.onCancelPurchaseHandler}
           purchaseContinued={this.onContinueHandler} />
-      }
-
-      if (this.state.loading) {
-        orderSummary = <Spinner />
-      }
+      } 
 
       return (
         <Aux>
@@ -94,14 +85,15 @@ const mapStateToProps = state => {
   return {
     ingredients: state.ingredients,
     totalPrice: state.totalPrice,
-    purchaseable: state.purchaseState
+    error: state.error
   }
 }
 
 const mapDispatchToProps = dispatch => {
   return {
-    addIngredient: (ingredientType) => dispatch({ type: actionTypes.ADD_INGREDIENT, ingredientType: ingredientType }),
-    removeIngredient: (ingredientType) => dispatch({ type: actionTypes.REMOVE_INGREDIENT, ingredientType: ingredientType })
+    addIngredient: (ingredientType) => dispatch(burgerBuilderActions.addIngredient(ingredientType)),
+    removeIngredient: (ingredientType) => dispatch(burgerBuilderActions.removeIngredient(ingredientType)),
+    initIngredients: () => dispatch(burgerBuilderActions.initIngredients())
   }
 }
 
