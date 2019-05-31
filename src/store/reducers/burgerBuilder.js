@@ -1,4 +1,5 @@
 import * as actionTypes from "../actions/actionTypes"
+import { updateObject } from "../utility"
 
 const initialState = {
     ingredients: null,
@@ -13,47 +14,46 @@ const INGREDIENT_PRICES = {
     bacon: 0.7
   }
 
-const addIngredientHandler = (state, type) => {
-    return {
-        ...state, 
-        ingredients: {
-            ...state.ingredients,
-            [type]: state.ingredients[type] + 1
-        },
-        totalPrice: state.totalPrice + INGREDIENT_PRICES[type],
-    }    
+const addIngredient = (state, type) => {
+    const updatedIngredient = {[type]: state.ingredients[type] + 1}
+    const updatedIngredients = updateObject(state.ingredients, updatedIngredient )
+    const updateState = {
+        ingredients: updatedIngredients,
+        totalPrice: state.totalPrice + INGREDIENT_PRICES[type]
+    }
+    return updateObject(updateState)
 }
 
-const removeIngredientHandler = (state, type) => {
-    return {
-        ...state, 
-        ingredients: {
-            ...state.ingredients,
-            [type]: state.ingredients[type] - 1
-        },
-        totalPrice: state.totalPrice - INGREDIENT_PRICES[type],
-    }   
+const removeIngredient = (state, type) => {
+    const updatedIngredient = {[type]: state.ingredients[type] - 1}
+    const updatedIngredients = updateObject(state.ingredients, updatedIngredient )
+    const updateState = {
+        ingredients: updatedIngredients,
+        totalPrice: state.totalPrice - INGREDIENT_PRICES[type]
+    }
+    return updateObject(state, updateState)
   }
+
+const setIngredient = (state, action) => {
+    const updatedState = {
+        ingredients: action.ingredients,
+        totalPrice: 4,
+        error: false
+    }
+    return updateObject(state, updatedState)
+}
+
+const fetchIngredientFailed = (state, action) => {
+    return updateObject(state, {error: true})
+}
 
 const reducer = (state=initialState, action) => {
     switch(action.type){
-        case actionTypes.ADD_INGREDIENT:
-            return addIngredientHandler(state, action.ingredientType)
-        case actionTypes.REMOVE_INGREDIENT:
-            return removeIngredientHandler(state, action.ingredientType)
-        case actionTypes.SET_INGREDIENTS: 
-            return { 
-                ...state, 
-                ingredients: action.ingredients,
-                error: false
-            }
-        case actionTypes.FETCH_INGREDIENTS_FAILED:
-            return {
-                ...state,
-                error: true
-            }
-        default:
-            return state
+        case actionTypes.ADD_INGREDIENT: return addIngredient(state, action.ingredientType)
+        case actionTypes.REMOVE_INGREDIENT: return removeIngredient(state, action.ingredientType)
+        case actionTypes.SET_INGREDIENTS: return setIngredient(state, action)            
+        case actionTypes.FETCH_INGREDIENTS_FAILED: return fetchIngredientFailed
+        default: return state
     }
 }
 
