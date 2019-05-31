@@ -15,7 +15,6 @@ import axios from '../../axios-orders'
 
 class BurgerBuilder extends Component {
     state = {
-      ingredients: null, // TODO remove with asycn redux section
       purchasing: false,
       loading: false,
       errorState: false,
@@ -23,9 +22,9 @@ class BurgerBuilder extends Component {
     }
 
     componentDidMount () {
-      axios.get('https://react-my-burger-dfe14.firebaseio.com/ingredients.json')
-        .then(response => this.setState({ ingredients: response.data }))
-        .catch(error => this.setState({ errorState: true, error: error }))
+      // axios.get('https://react-my-burger-dfe14.firebaseio.com/ingredients.json')
+      //   .then(response => this.setState({ ingredients: response.data }))
+      //   .catch(error => this.setState({ errorState: true, error: error }))
     }
 
     onPurchaseHandler = () => {
@@ -49,8 +48,15 @@ class BurgerBuilder extends Component {
       })
     }
 
+    updatePurchaseState = (ingredients) => {
+      const sum = Object.keys(ingredients)
+        .map(ingredientKey => ingredients[ingredientKey])
+        .reduce((sum, el) => sum + el, 0)
+      return sum > 0
+  }
+
     render () {
-      const disabledInfo = { ...this.state.ingredients }
+      const disabledInfo = { ...this.props.ingredients }
       for (let key in disabledInfo) {
         disabledInfo[key] = disabledInfo[key] <= 0
       }
@@ -66,7 +72,7 @@ class BurgerBuilder extends Component {
               ingredientRemoved={this.props.removeIngredient}
               disabled={disabledInfo}
               price={this.props.totalPrice}
-              purchaseable={this.props.purchaseable}
+              purchaseable={this.updatePurchaseState(this.props.ingredients)}
               purchaseHandler={this.onPurchaseHandler}
             />
           </Aux>

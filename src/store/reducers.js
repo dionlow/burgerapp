@@ -18,49 +18,26 @@ const INGREDIENT_PRICES = {
     bacon: 0.7
   }
 
-const getPurchaseState = (ingredients) => {
-    const sum = Object.keys(ingredients)
-      .map(ingredientKey => ingredients[ingredientKey])
-      .reduce((sum, el) => sum + el, 0)
-
-    const purchaseState = sum > 0
-    return purchaseState
-}
-
 const addIngredientHandler = (state, type) => {
-    const oldCount = state.ingredients[type]
-    const updatedCount = oldCount + 1
-    const updatedIngredients = { ...state.ingredients }
-    updatedIngredients[type] = updatedCount
-
-    const priceAddition = INGREDIENT_PRICES[type]
-    const newPrice = state.totalPrice + priceAddition
-
-    const newPurchaseState = getPurchaseState(updatedIngredients)
     return {
         ...state, 
-        ingredients: updatedIngredients,
-        totalPrice: newPrice,
-        purchaseState: newPurchaseState
+        ingredients: {
+            ...state.ingredients,
+            [type]: state.ingredients[type] + 1
+        },
+        totalPrice: state.totalPrice + INGREDIENT_PRICES[type],
     }    
 }
 
 const removeIngredientHandler = (state, type) => {
-    const oldCount = state.ingredients[type]
-    const updatedCount = Math.max(oldCount - 1, 0)
-    const updatedIngredients = { ...state.ingredients }
-    updatedIngredients[type] = updatedCount
-
-    const priceSubtraction = INGREDIENT_PRICES[type]
-    const newPrice = this.state.totalPrice - priceSubtraction
-
-    const newPurchaseState = getPurchaseState(updatedIngredients)
     return {
         ...state, 
-        ingredients: updatedIngredients,
-        totalPrice: newPrice,
-        purchaseState: newPurchaseState
-    }  
+        ingredients: {
+            ...state.ingredients,
+            [type]: state.ingredients[type] - 1
+        },
+        totalPrice: state.totalPrice - INGREDIENT_PRICES[type],
+    }   
   }
 
 const reducer = (state=initialState, action) => {
